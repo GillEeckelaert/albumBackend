@@ -6,7 +6,7 @@ from ..schemas.Schemas import schema
 docRoutesBlueprint = Blueprint('docRoutes', __name__)
 
 app.add_url_rule(
-    '/graphql-api',
+    '/graphql',
     view_func=GraphQLView.as_view(
         'graphql',
         schema=schema,
