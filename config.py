@@ -6,7 +6,7 @@ print(path.join(basedir, 'variables.env'))
 load_dotenv(path.join(basedir, 'variables.env'))
 
 class Config(object):
-    FLASK_ENV = 'development'
+    FLASK_ENV = 'production'
     TESTING = True
     DEBUG = True
     STATIC_FOLDER = 'static'
