@@ -63,6 +63,12 @@ class Query(graphene.ObjectType):
     all_series = SQLAlchemyConnectionField(SerieObject)
     all_collections = SQLAlchemyConnectionField(CollectionObject)
     all_user_books = SQLAlchemyConnectionField(UserBookObject)
+    book = relay.Node.Field(BookObject)
+    user = relay.Node.Field(UserObject)
+    author = relay.Node.Field(AuthorObject)
+    serie = relay.Node.Field(SerieObject)
+    collection = relay.Node.Field(CollectionObject)
+    user_book = relay.Node.Field(UserBookObject)
 
 # User Mutations
 class AddUser(graphene.Mutation):
