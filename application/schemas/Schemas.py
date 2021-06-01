@@ -72,9 +72,9 @@ class Query(graphene.ObjectType):
 
     find_user = graphene.Field(lambda: UserObject, username=graphene.String())
 
-    def resolve_find_user(self, args, context, info):
-        query = UserObject.get_query(context)
-        username = args.get('username')
+    def resolve_find_user(self, info, **kwargs):
+        query = UserObject.get_query(info)
+        username = kwargs.get('username')
         return query.filter(UserModel.username == username).first()
 
 # User Mutations
