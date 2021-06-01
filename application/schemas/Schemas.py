@@ -70,6 +70,11 @@ class Query(graphene.ObjectType):
     collection = relay.Node.Field(CollectionObject)
     user_book = relay.Node.Field(UserBookObject)
 
+    def resolve_find_user(self, args, context, info):
+        query = UserObject.get_query(context)
+        username = args.get('username')
+        return query.filter(UserModel.username == username).first()
+
 # User Mutations
 class AddUser(graphene.Mutation):
     class Arguments:
