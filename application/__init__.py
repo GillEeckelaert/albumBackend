@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-
+from flask_cors import CORS
 
 # Globally accessible libraries
 db = SQLAlchemy()
@@ -9,6 +9,7 @@ db = SQLAlchemy()
 def init_app():
     """Initialize the core application."""
     app = Flask(__name__, instance_relative_config=False)
+    CORS(app)
     app.config.from_object('config.Config')
 
     # Initialize Plugins
