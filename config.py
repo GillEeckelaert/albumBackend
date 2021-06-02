@@ -9,7 +9,7 @@ class Config(object):
     FLASK_ENV = 'production'
     STATIC_FOLDER = 'static'
 
-    SQLALCHEMY_DATABASE_URI = 'postgresql://oktzbogwjcorkm:3529cfa5ca57bd1d863a1325a5ce3eb067f50b97f828b2ac295c0e9f9862072a@ec2-63-34-97-163.eu-west-1.compute.amazonaws.com:5432/d5lqcrvilccju2'
+    SQLALCHEMY_DATABASE_URI = 'postgres://mwwxexnafnvzoz:68f224a5e7b0476b7a9d4635fed7f3227359c0215dffa17a6baa7fb90b8a47f9@ec2-63-33-239-176.eu-west-1.compute.amazonaws.com:5432/dec7po8bqjh0qt'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = False
 
