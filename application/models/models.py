@@ -18,6 +18,11 @@ AuthorBook = db.Table('AuthorBook',
     db.Column('authorId', db.Integer, db.ForeignKey('Authors.id')),
     db.Column('bookId', db.Integer, db.ForeignKey('Books.id')))
 
+UserEvent = db.Table('UserEvent',
+    db.Column('id', db.Integer, primary_key=True),
+    db.Column('userId', db.Integer, db.ForeignKey('Users.id')),
+    db.Column('eventId', db.Integer, db.ForeignKey('Events.id')))
+
 class UserBook(db.Model):
     __tablename__ = 'UserBooks'
     id = db.Column(db.Integer, primary_key=True)
@@ -44,6 +49,7 @@ class User(db.Model):
     books = db.relationship("UserBook", backref="User")
     series = db.relationship("Serie", secondary=UserSerie , backref="Owner")
     collections = db.relationship("Collection", secondary=UserCollection , backref="Owner")
+    events = db.relationship("Event", secondary=UserEvent, backref="User")
     #books = association_proxy('book_associations', 'book')
 
     def __repr__(self):
@@ -99,4 +105,24 @@ class Author(db.Model):
     books = db.relationship("Book", secondary=AuthorBook, backref="Author")
 
     def __repr__(self):
-        return '<Author {}>'.format(self.name)    
+        return '<Author {}>'.format(self.name)  
+
+class Event(db.Model):
+    __tablename__='Events'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), index=True, unique=True)
+    type = db.Column(db.String)
+    date = db.Column(db.Date)
+    time = db.Column(db.Time)
+    ticketsAmount = db.Column(db.Integer)
+    eticket = db.Column(db.Boolean)
+    confirmation = db.Column(db.Boolean)
+    country = db.Column(db.String)
+    city = db.Column(db.String)
+    venue = db.Column(db.String)
+    price = db.Column(db.Float)
+    seats = db.Column(db.String)
+    users = db.relationship("User", secondary=UserEvent, backref="Event")
+
+    def __repr__(self):
+        return '<Event {}>'.format(self.title)  

@@ -15,6 +15,7 @@ from ..models.models import UserCollection as UCModel
 from ..models.models import UserBook as UBModel
 from ..models.models import UserSerie as USModel
 from ..models.models import AuthorBook as ABModel
+from ..models.models import Event as EventModel
 
 def get_model_type(model):
     registry = get_global_registry()
@@ -31,6 +32,7 @@ class UserObject(SQLAlchemyObjectType):
         model = UserModel
         interfaces = (relay.Node, )
     books = graphene.List(get_model_type(UBModel))
+    events = graphene.List(get_model_type(EventModel))
 
 class BookObject(SQLAlchemyObjectType):
     class Meta:
@@ -55,6 +57,12 @@ class CollectionObject(SQLAlchemyObjectType):
         model = CollectionModel
         interfaces = (relay.Node, )
 
+class EventObject(SQLAlchemyObjectType):
+    class Meta:
+        model = EventModel
+        interfaces = (relay.Node, )
+    users = graphene.List(get_model_type(UserModel))
+
 class Query(graphene.ObjectType):
     node = relay.Node.Field()
     all_books = SQLAlchemyConnectionField(BookObject)
@@ -63,12 +71,14 @@ class Query(graphene.ObjectType):
     all_series = SQLAlchemyConnectionField(SerieObject)
     all_collections = SQLAlchemyConnectionField(CollectionObject)
     all_user_books = SQLAlchemyConnectionField(UserBookObject)
+    all_events = SQLAlchemyConnectionField(EventObject)
     book = relay.Node.Field(BookObject)
     user = relay.Node.Field(UserObject)
     author = relay.Node.Field(AuthorObject)
     serie = relay.Node.Field(SerieObject)
     collection = relay.Node.Field(CollectionObject)
     user_book = relay.Node.Field(UserBookObject)
+    event = relay.Node.Field(EventObject)
 
     find_user = graphene.Field(lambda: UserObject, username=graphene.String())
 
@@ -571,6 +581,149 @@ class DeleteAuthor(graphene.Mutation):
         db.session.commit()
         return DeleteAuthor(author=author)
 
+# Event Mutations
+
+class AddEvent(graphene.Mutation):
+    class Arguments:
+        title = graphene.String(required=True)
+        users = graphene.String(required=True)
+        type = graphene.String(required=True)
+        date = graphene.Date(required=True)
+        time = graphene.Time(required=False, default_value=None)
+        ticketsAmount = graphene.Int(required=False, default_value=1)
+        eticket = graphene.Boolean(required=False, default_value=None)
+        price = graphene.Float(required=False, default_value=None)
+        confirmation = graphene.Boolean(required=False, default_value=None)
+        country = graphene.String(required=False, default_value=None)
+        city = graphene.String(required=False, default_value=None)
+        venue = graphene.String(required=False, default_value=None)
+        seats = graphene.String(required=False, default_value=None)
+    event = graphene.Field(lambda: EventObject)
+
+    def mutate(self, info, title, users, type, date, **kwargs):
+        time = kwargs.get('time', None)
+        ticketsAmount = kwargs.get('ticketsAmount', 0)
+        eticket = kwargs.get('eticket', None)
+        price = kwargs.get('price', None)
+        confirmation = kwargs.get('confirmation', None)
+        country = kwargs.get('country', None)
+        city = kwargs.get('city', None)
+        venue = kwargs.get('venue', None)
+        seats = kwargs.get('seats', None)
+
+        user = UserModel.query.filter_by(username=users).first()
+        if user is None:
+            raise GraphQLError('EVent cannot be added to non-existent user.')
+        
+        event = EventModel.query.filter_by(title=title).first()
+        if event is None:
+            event = EventModel(title=title, users=[user], type=type, date=date)
+        else:
+            event.users.append(user)
+
+        if time is not None:
+            event.time = time
+        
+        if ticketsAmount is not None:
+            event.ticketsAmount = ticketsAmount
+        
+        if eticket is not None:
+            event.eticket = eticket
+
+        if price is not None:
+            event.price = price
+
+        if confirmation is not None:
+            event.confirmation = confirmation
+
+        if country is not None:
+            event.country = country
+
+        if city is not None:
+            event.city = city
+
+        if venue is not None:
+            event.venue = venue
+        
+        if seats is not None:
+            event.seats = seats
+
+        db.session.add(event)
+        db.session.commit()
+        return AddEvent(event=event)
+
+class UpdateEvent(graphene.Mutation):
+    class Arguments:
+        title = graphene.String(required=True)
+        type = graphene.String(required=False, default_value=None)
+        date = graphene.Date(required=False, default_value=None)
+        time = graphene.Time(required=False, default_value=None)
+        ticketsAmount = graphene.Int(required=False, default_value=1)
+        eticket = graphene.Boolean(required=False, default_value=None)
+        price = graphene.Float(required=False, default_value=None)
+        confirmation = graphene.Boolean(required=False, default_value=None)
+        country = graphene.String(required=False, default_value=None)
+        city = graphene.String(required=False, default_value=None)
+        venue = graphene.String(required=False, default_value=None)
+        seats = graphene.String(required=False, default_value=None)
+    book = graphene.Field(lambda: BookObject)
+
+    def mutate(self, info, title, **kwargs):
+        type = kwargs.get('type', None)
+        date = kwargs.get('date', None)
+        time = kwargs.get('time', None)
+        ticketsAmount = kwargs.get('ticketsAmount', 0)
+        eticket = kwargs.get('eticket', None)
+        price = kwargs.get('price', None)
+        confirmation = kwargs.get('confirmation', None)
+        country = kwargs.get('country', None)
+        city = kwargs.get('city', None)
+        venue = kwargs.get('venue', None)
+        seats = kwargs.get('seats', None)
+
+        event = EventModel.query.filter_by(title=title).first()
+        if event is None:
+            raise GraphQLError('Event to update cannot be found.')
+        
+        if title is not None:
+            event.title = title
+        
+        if type is not None:
+            event.type = type
+
+        if date is not None:
+            event.date = date
+
+        if time is not None:
+            event.time = time
+        
+        if ticketsAmount is not None:
+            event.ticketsAmount = ticketsAmount
+        
+        if eticket is not None:
+            event.eticket = eticket
+
+        if price is not None:
+            event.price = price
+
+        if confirmation is not None:
+            event.confirmation = confirmation
+
+        if country is not None:
+            event.country = country
+
+        if city is not None:
+            event.city = city
+
+        if venue is not None:
+            event.venue = venue
+        
+        if seats is not None:
+            event.seats = seats
+
+        db.session.commit()
+        return UpdateEvent(event=event)
+
 class Mutation(graphene.ObjectType):
     add_user = AddUser.Field()
     update_user = UpdateUser.Field()
@@ -592,6 +745,9 @@ class Mutation(graphene.ObjectType):
     add_author = AddAuthor.Field()
     update_author = UpdateAuthor.Field()
     delete_author = DeleteAuthor.Field()
+
+    add_event = AddEvent.Field()
+    update_event = UpdateEvent.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
