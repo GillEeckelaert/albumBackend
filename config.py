@@ -1,7 +1,4 @@
 from os import environ, path
-from boto.s3.connection import S3Connection
-
-s3 = S3Connection(environ['DATABASE_URL'])
 
 basedir = path.abspath(path.dirname(__file__))
 
