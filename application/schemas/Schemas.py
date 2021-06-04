@@ -726,19 +726,27 @@ class UpdateEvent(graphene.Mutation):
 
 class DeleteEvent(graphene.Mutation):
     class Arguments:
+        username = graphene.String(required=True)
         title = graphene.String(required=True)
     event = graphene.Field(lambda: EventObject)
 
-    def mutate(self, info, title):
+    def mutate(self, info, title, username):
         event = EventModel.query.filter_by(title=title).first()
         if event is None:
             raise GraphQLError('Event is not found.')
 
-        event.users = []
+        user = UserModel.query.filter_by(usernamen=username).first()
+        if user is None:
+            raise GraphQLError('User could not be found.')
+
+        event.users.remove(user)
 
         db.session.commit()
-        db.session.delete(event)
-        db.session.commit()
+
+        if (len(event.users) == 0):
+            db.session.delete(event)
+            db.session.commit()
+            
         return DeleteEvent(event=event)
 
 
