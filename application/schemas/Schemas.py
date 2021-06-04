@@ -724,6 +724,24 @@ class UpdateEvent(graphene.Mutation):
         db.session.commit()
         return UpdateEvent(event=event)
 
+class DeleteEvent(graphene.Mutation):
+    class Arguments:
+        title = graphene.String(required=True)
+    event = graphene.Field(lambda: EventObject)
+
+    def mutate(self, info, title):
+        event = EventModel.query.filter_by(title=title).first()
+        if event is None:
+            raise GraphQLError('Event is not found.')
+
+        event.users = []
+
+        db.session.commit()
+        db.session.delete(event)
+        db.session.commit()
+        return DeleteEvent(event=event)
+
+
 class Mutation(graphene.ObjectType):
     add_user = AddUser.Field()
     update_user = UpdateUser.Field()
@@ -748,6 +766,7 @@ class Mutation(graphene.ObjectType):
 
     add_event = AddEvent.Field()
     update_event = UpdateEvent.Field()
+    delete_event = DeleteEvent.Field()
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
