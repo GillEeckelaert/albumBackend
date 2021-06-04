@@ -735,7 +735,7 @@ class DeleteEvent(graphene.Mutation):
         if event is None:
             raise GraphQLError('Event is not found.')
 
-        user = UserModel.query.filter_by(usernamen=username).first()
+        user = UserModel.query.filter_by(username=username).first()
         if user is None:
             raise GraphQLError('User could not be found.')
 
@@ -746,7 +746,7 @@ class DeleteEvent(graphene.Mutation):
         if (len(event.users) == 0):
             db.session.delete(event)
             db.session.commit()
-            
+
         return DeleteEvent(event=event)
 
 
