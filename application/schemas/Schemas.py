@@ -589,7 +589,9 @@ class AddEvent(graphene.Mutation):
         users = graphene.String(required=True)
         type = graphene.String(required=True)
         date = graphene.Date(required=True)
+        endDate = graphene.Date(required=True)
         time = graphene.Time(required=False, default_value=None)
+        endTime = graphene.Time(required=False, default_value=None)
         ticketsAmount = graphene.Int(required=False, default_value=1)
         eticket = graphene.Boolean(required=False, default_value=None)
         price = graphene.Float(required=False, default_value=None)
@@ -602,6 +604,8 @@ class AddEvent(graphene.Mutation):
 
     def mutate(self, info, title, users, type, date, **kwargs):
         time = kwargs.get('time', None)
+        endTime = kwargs.get('endTime', None)
+        endDate = kwargs.get('endDate', None)
         ticketsAmount = kwargs.get('ticketsAmount', 0)
         eticket = kwargs.get('eticket', None)
         price = kwargs.get('price', None)
@@ -623,6 +627,12 @@ class AddEvent(graphene.Mutation):
 
         if time is not None:
             event.time = time
+
+        if endTime is not None:
+            event.endTime = endTime
+
+        if endDate is not None:
+            event.endDate = endDate
         
         if ticketsAmount is not None:
             event.ticketsAmount = ticketsAmount
@@ -657,7 +667,9 @@ class UpdateEvent(graphene.Mutation):
         title = graphene.String(required=True)
         type = graphene.String(required=False, default_value=None)
         date = graphene.Date(required=False, default_value=None)
+        endDate = graphene.Date(required=False, default_value=None)
         time = graphene.Time(required=False, default_value=None)
+        endTime = graphene.Time(required=False, default_value=None)
         ticketsAmount = graphene.Int(required=False, default_value=1)
         eticket = graphene.Boolean(required=False, default_value=None)
         price = graphene.Float(required=False, default_value=None)
@@ -671,7 +683,9 @@ class UpdateEvent(graphene.Mutation):
     def mutate(self, info, title, **kwargs):
         type = kwargs.get('type', None)
         date = kwargs.get('date', None)
+        endDate = kwargs.get('endDate', None)
         time = kwargs.get('time', None)
+        endTime = kwargs.get('endTime', None)
         ticketsAmount = kwargs.get('ticketsAmount', 0)
         eticket = kwargs.get('eticket', None)
         price = kwargs.get('price', None)
@@ -693,9 +707,15 @@ class UpdateEvent(graphene.Mutation):
 
         if date is not None:
             event.date = date
+        
+        if endDate is not None:
+            event.endDate = endDate
 
         if time is not None:
             event.time = time
+
+        if endTime is not None:
+            event.endTime = endTime
         
         if ticketsAmount is not None:
             event.ticketsAmount = ticketsAmount
